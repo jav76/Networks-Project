@@ -5,7 +5,7 @@ class host: # host that receives connections and displays incoming messages
     def __init__(self):
         self.node = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-        ipPort = ("", 111)
+        ipPort = ("", 1111) # Elevated permissions required for ports 0-1024
         self.node.bind(ipPort)
         self.connections = []
         print(f"host socket started on {socket.gethostbyname(socket.gethostname())}")
@@ -16,10 +16,10 @@ class host: # host that receives connections and displays incoming messages
             newConnection = self.node.accept() # Blocks until accepting a new connection
             print(f"New connection {newConnection} accepted")
             self.connections.append(newConnection)
-            always_receive = threading.Thread(target=self.receive_sms, args=[newConnection])
+            always_receive = threading.Thread(target=self.receive_msg, args=[newConnection])
             always_receive.start()
 
-    def receive_sms(self, conn):
+    def receive_msg(self, conn):
         while True:
             data = conn[0].recv(1024).decode()
             print(f"Received: {data}   From: {conn}")
@@ -75,7 +75,7 @@ if __name__ == "__main__":
                     ipStart = msg.find(" ")
                     portStart = msg.find(" ", ipStart + 1)
                     ip = -1
-                    port = 22
+                    port = 1111
                     if ipStart != -1:
                         if portStart != -1:
                             ip = msg[ipStart + 1: portStart]
