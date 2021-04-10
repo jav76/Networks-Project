@@ -39,10 +39,10 @@ class connectionNode: # For outgoing connections
             log.warning(f"Could not connect to {self.ipPort}")
             del self
 
-    def send_sms(self, message):
+    def send_msg(self, message):
         self.node.send(message.encode())
 
     def main(self):
         while True:
             message = input()
-            self.send_sms(message)
+            self.send_msg(message)

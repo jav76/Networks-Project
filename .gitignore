@@ -1,7 +1,7 @@
-*id*
+*id_rsa*
 log.txt
-*hosts*
-*keys*
+*known_hosts
+*authorized_keys
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
