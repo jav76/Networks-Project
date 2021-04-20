@@ -3,17 +3,20 @@ from pythonRSA import *
 from networking import *
 import logging as log
 
-
 if __name__ == "__main__":
-    log.basicConfig(filename='log.txt', encoding='utf-8', level=log.DEBUG)
+    log.basicConfig(filename='log.txt', level=log.DEBUG)
     root = log.getLogger()
     root.setLevel(log.DEBUG)
     handler = log.StreamHandler(sys.stdout)
-    handler.setLevel(log.INFO)
+    handler.setLevel(log.DEBUG)
     formatter = log.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     handler.setFormatter(formatter)
     root.addHandler(handler)
 
+    try:
+        portMapping()
+    except Exception as e:
+        log.warning(f"Could not start UPnP: {e}")
     log.debug("Hello networked world!")
     server = host()
     always_receive = threading.Thread(target=server.acceptConnections)
@@ -60,13 +63,13 @@ if __name__ == "__main__":
                             log.error(e)
                             continue
 
-                    newNode = connectionNode(ip, port)
-                    if newNode.connected:
-                        nodes.append((newNode, None))
-                        log.info(f"Connected to {(ip, port)}")
-                        currentNode = newNode
-                        log.info(f"Now chatting with {(currentNode, ipPort)}")
-                        connected = True
+                        newNode = connectionNode(ip, port)
+                        if newNode.connected:
+                            nodes.append((newNode, None))
+                            log.info(f"Connected to {(ip, port)}")
+                            currentNode = newNode
+                            log.info(f"Now chatting with {(currentNode, ipPort)}")
+                            connected = True
 
                     log.debug(nodes)
 
