@@ -13,6 +13,14 @@ if __name__ == "__main__":
     handler.setFormatter(formatter)
     root.addHandler(handler)
 
+    """ Encryption demo:
+    teststr = "testing asdasdfasdfgdfghdfghdfghdfghdfghdfghdfghdfghdfghdfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaghdfghdfghdfghdfghfasdfasdfasdfasfdf"
+    pub, priv = genKeys(4096)
+    enc = encrypt(teststr, pub)
+    print(enc)
+    print(decrypt(enc, priv))
+    """
+
     try:
         portMapping()
     except Exception as e:
