@@ -57,7 +57,7 @@ if __name__ == "__main__":
                     for i in nodes:
                         if i[0].ipPort[0] == ip or i[1] == name:
                             currentNode = i
-                            log.info(f"Now chatting with {(currentNode, i.ipPort)}")
+                            log.info(f"Now chatting with {(currentNode, i[0].ipPort)}")
                             connected = True
 
                     if not connected:
