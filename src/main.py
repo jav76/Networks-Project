@@ -1,4 +1,4 @@
-import threading, sys
+import threading, sys, codecs
 from pythonRSA import *
 from networking import *
 import logging as log
@@ -14,11 +14,13 @@ if __name__ == "__main__":
     root.addHandler(handler)
 
     """
-    teststr = "testing asdasdfasdfgdfghdfghdfghdfghdfghdfghdfghdfghdfghdfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaghdfghdfghdfghdfghfasdfasdfasdfasfdf"
-    pub, priv = genKeys(4096)
-    enc = encrypt(teststr, pub)
+    teststr = "testing asdasdfasdfgdfaaaaaaaaaaaaaaaaaaaaghdfghdfghdfghdfghfasdfasdfasdfasfdf"
+    genKeys(2048)
+    enc = encryptFromFile(teststr, "id_rsa.pub")
     print(enc)
-    print(decrypt(enc, priv))
+    enc = str(codecs.encode(enc, "hex").upper(), "utf-8")
+    print(enc)
+    print(decryptFromFile(codecs.decode(enc, "hex"), "id_rsa"))
     """
 
     """
@@ -64,9 +66,9 @@ if __name__ == "__main__":
                     ipPort = (ip, port)
 
                     for i in nodes:
-                        if i[0].ipPort[0] == ip or i[1] == name:
+                        if i.ipPort[0] == ip:
                             currentNode = i
-                            log.info(f"Now chatting with {(currentNode, i[0].ipPort)}")
+                            log.info(f"Now chatting with {(currentNode, i.ipPort)}")
                             connected = True
 
                     if not connected:
@@ -82,7 +84,7 @@ if __name__ == "__main__":
 
                         newNode = connectionNode(ip, port)
                         if newNode.connected:
-                            nodes.append((newNode, None))
+                            nodes.append(newNode)
                             log.info(f"Connected to {(ip, port)}")
                             currentNode = newNode
                             log.info(f"Now chatting with {(currentNode, ipPort)}")
@@ -116,13 +118,40 @@ if __name__ == "__main__":
 
                 if msg[1:7] == "keygen": #/keygen
                     args = msg[8:].split(" ")
-                    size = 1024
+                    size = 3072
                     if args[0].isnumeric():
                         size = args[0]
                     genKeys(int(size))
 
+                if msg[1:8] == "encrypt": #/encrypt
+                    if currentNode:
+                        currentNode.encrypted = True
+
             else:
                 if currentNode:
-                    currentNode.send_msg(msg)
+                    header = [
+                        f"ENCRYPTED: {currentNode.encrypted} ",
+                        f"MSG: "
+                    ]
+                    if currentNode.encrypted:
+                        pubKey = ""
+                        JSONdata = readJSON()
+                        entryExists = False
+                        for hosts in JSONdata["hosts"]:
+                            if hosts["ip"] == currentNode.ipPort[0] and hosts["direction"] == "incoming":
+                                pubKey = hosts["pubKey"]
+                                break
+                        if len(pubKey) > 0:
+                            msg = "".join(header) + str(codecs.encode(encryptFromFile(msg, key = pubKey), "hex").upper(), "utf-8")
+                        else:
+                            print(f"No pubkey key for {currentNode.ipPort} exists")
+                            continue
+
+                        currentNode.send_msg(msg)
+                    else:
+                        msg = "".join(header) + msg
+
+                        currentNode.send_msg(msg)
+                    log.debug(f"Sent {msg} to {currentNode.ipPort}")
 
 

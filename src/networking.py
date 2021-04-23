@@ -1,5 +1,6 @@
-import socket, threading, upnpy, time, json
+import socket, threading, upnpy, time, json, codecs
 import logging as log
+from pythonRSA import *
 
 class host: # host that receives connections and displays incoming messages
     def __init__(self):
@@ -19,7 +20,7 @@ class host: # host that receives connections and displays incoming messages
             JSONdata = readJSON()
             entryExists = False
             for hosts in JSONdata["hosts"]:
-                if hosts["ip"] == ipPort[0] and hosts["port"] == ipPort[1] and hosts["direction"] == "incoming":
+                if hosts["ip"] == ipPort[0] and hosts["direction"] == "incoming":
                     entryExists = True
                     log.debug(f"JSON entry for {ipPort} already exists")
                     break
@@ -53,9 +54,22 @@ class host: # host that receives connections and displays incoming messages
         except:
             pass
         while True:
-            data = conn[0].recv(1024).decode()
-            print(data)
+            data = conn[0].recv(2048).decode()
+            args = data.split()
+            encryptStart = args.index("ENCRYPTED:")
+            encrypted = eval(args[encryptStart + 1])
+            if "MSG:" in args:
+                msgStart = args.index("MSG:")
+                msgenc = "".join(args[msgStart+1:])
+                if encrypted:
+                    try:
+                        msg = decryptFromFile(codecs.decode(msgenc, "hex"))
+                        print(msg)
+                    except Exception as e:
+                        print(msgenc)
+
             log.debug(f"Received: {data}   From: {hostname} {ipPort}")
+
 
 
 class connectionNode: # For outgoing connections
@@ -75,6 +89,9 @@ class connectionNode: # For outgoing connections
 
     def send_msg(self, message):
         self.node.send(message.encode())
+
+    def send_bytes(self, message):
+        self.node.send(message)
 
 def readJSON():
     with open("known_hosts.json", mode="r") as f:

@@ -15,9 +15,6 @@ def genKeys(keySize):
         log.warning("Could not write keys to file")
     return public, private
 
-
-
-
 def encrypt(msg, key):
     try:
         msg = msg.encode("utf-8", errors="strict")
@@ -29,7 +26,6 @@ def encrypt(msg, key):
         return None
     return rsa.encrypt(msg, key)
 
-
 def decrypt(msg, key):
     try:
         msg = rsa.decrypt(msg, key)
@@ -37,3 +33,23 @@ def decrypt(msg, key):
         log.error(f"Could not decrypt {msg} : {e}")
         return None
     return msg.decode("utf8")
+
+def encryptFromFile(msg, file = "id_rsa.pub", key = ""):
+    if key == "":
+        with open(file, "rb") as f:
+            keyData = f.read()
+            f.close()
+        pubKey = rsa.PublicKey.load_pkcs1(keyData)
+    else:
+        pubKey = rsa.PublicKey.load_pkcs1(key)
+    return encrypt(msg, pubKey)
+
+def decryptFromFile(msg, file = "id_rsa", key = ""):
+    if key == "":
+        with open(file, "rb") as f:
+            keyData = f.read()
+            f.close()
+        privKey = rsa.PrivateKey.load_pkcs1(keyData)
+    else:
+        privKey = rsa.PrivateKey.load_pkcs1(key)
+    return decrypt(msg, privKey)
