@@ -13,13 +13,22 @@ if __name__ == "__main__":
     handler.setFormatter(formatter)
     root.addHandler(handler)
 
-    """ Encryption demo:
+    """
     teststr = "testing asdasdfasdfgdfghdfghdfghdfghdfghdfghdfghdfghdfghdfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaghdfghdfghdfghdfghfasdfasdfasdfasfdf"
     pub, priv = genKeys(4096)
     enc = encrypt(teststr, pub)
     print(enc)
     print(decrypt(enc, priv))
     """
+
+    """
+    data = readJSON()
+    for i in data["hosts"]:
+        print(i)
+        for key, val in i.items():
+            print(f"{key} {val}")
+    """
+
 
     try:
         portMapping()
@@ -77,6 +86,30 @@ if __name__ == "__main__":
                             log.info(f"Connected to {(ip, port)}")
                             currentNode = newNode
                             log.info(f"Now chatting with {(currentNode, ipPort)}")
+                            JSONdata = readJSON()
+                            entryExists = False
+                            for hosts in JSONdata["hosts"]:
+                                if hosts["ip"] == ip and hosts["port"] == port and hosts["direction"] == "outgoing":
+                                    entryExists = True
+                                    log.debug(f"JSON entry for {ip} already exists.")
+                                    break
+                            if not entryExists:
+                                hostname = ""
+                                try:
+                                    hostname = socket.gethostbyaddr(ip)[0]
+                                except:
+                                    pass
+                                newEntry = {
+                                    "ip" : ip,
+                                    "name" : "",
+                                    "hostName" : hostname,
+                                    "port" : port,
+                                    "pubKey" : "",
+                                    "direction" : "outgoing"
+                                }
+                                JSONdata["hosts"].append(newEntry)
+                                writeJSON(JSONdata)
+                                log.debug(f"Wrote new JSON entry {newEntry}")
                             connected = True
 
                     log.debug(nodes)

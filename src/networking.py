@@ -1,4 +1,4 @@
-import socket, threading, upnpy
+import socket, threading, upnpy, time, json
 import logging as log
 
 class host: # host that receives connections and displays incoming messages
@@ -14,23 +14,56 @@ class host: # host that receives connections and displays incoming messages
         while True:
             self.node.listen(5)
             newConnection = self.node.accept() # Blocks until accepting a new connection
-            log.debug(f"New connection {newConnection} accepted")
+            log.debug(f"New connection {newConnection[1]} accepted")
+            ipPort = newConnection[1]
+            JSONdata = readJSON()
+            entryExists = False
+            for hosts in JSONdata["hosts"]:
+                if hosts["ip"] == ipPort[0] and hosts["port"] == ipPort[1] and hosts["direction"] == "incoming":
+                    entryExists = True
+                    log.debug(f"JSON entry for {ipPort} already exists")
+                    break
+            if not entryExists:
+                hostname = ""
+                try:
+                    hostname = socket.gethostbyaddr(ipPort[0])[0]
+                except:
+                    pass
+                newEntry = {
+                    "ip": ipPort[0],
+                    "name": "",
+                    "hostName": hostname,
+                    "port": ipPort[1],
+                    "pubKey": "",
+                    "direction": "incoming"
+                }
+                JSONdata["hosts"].append(newEntry)
+                writeJSON(JSONdata)
+                log.debug(f"Wrote new JSON entry {newEntry}")
+
             self.connections.append(newConnection)
             always_receive = threading.Thread(target=self.receive_msg, args=[newConnection])
             always_receive.start()
 
     def receive_msg(self, conn):
+        ipPort = conn[1]
+        hostname = ""
+        try:
+            socket.gethostbyaddr(ipPort[0])[0]
+        except:
+            pass
         while True:
             data = conn[0].recv(1024).decode()
             print(data)
-            log.debug(f"Received: {data}   From: {conn}")
+            log.debug(f"Received: {data}   From: {hostname} {ipPort}")
 
 
 class connectionNode: # For outgoing connections
-    def __init__(self, ip, port):
+    def __init__(self, ip, port, encrypted = False):
         self.node = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.ipPort = (ip, int(port))
         self.connected = False
+        self.encrypted = encrypted
         if self.connected == False:
             try:
                 self.node.connect(self.ipPort)
@@ -43,6 +76,17 @@ class connectionNode: # For outgoing connections
     def send_msg(self, message):
         self.node.send(message.encode())
 
+def readJSON():
+    with open("known_hosts.json", mode="r") as f:
+        data = json.loads(f.read())
+        f.close()
+        return data
+
+def writeJSON(outText):
+    with open("known_hosts.json", mode="w") as f:
+        json.dump(outText, f, indent=4)
+        f.close()
+    return
 
 def portMapping():
     upnp = upnpy.UPnP()
