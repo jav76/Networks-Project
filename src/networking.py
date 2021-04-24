@@ -62,10 +62,10 @@ class host: # host that receives connections and displays incoming messages
                 msgStart = args.index("MSG:")
                 msgenc = "".join(args[msgStart+1:])
                 if encrypted:
-                    try:
-                        msg = decryptFromFile(codecs.decode(msgenc, "hex"))
+                    msg = decryptFromFile(codecs.decode(msgenc, "hex"))
+                    if msg is not None:
                         print(msg)
-                    except Exception as e:
+                    else:
                         print(msgenc)
 
             log.debug(f"Received: {data}   From: {hostname} {ipPort}")
@@ -94,13 +94,23 @@ class connectionNode: # For outgoing connections
         self.node.send(message)
 
 def readJSON():
-    with open("known_hosts.json", mode="r") as f:
-        data = json.loads(f.read())
-        f.close()
-        return data
+    try:
+        with open("../known_hosts.json", mode="r") as f:
+            data = json.loads(f.read())
+            f.close()
+            return data
+    except FileNotFoundError:
+        newDict = {
+            "hosts": []
+        }
+        writeJSON(newDict)
+        return readJSON()
+    except Exception as e:
+        log.error(f"Could not read JSON file {e}")
+        return None
 
 def writeJSON(outText):
-    with open("known_hosts.json", mode="w") as f:
+    with open("../known_hosts.json", mode="w") as f:
         json.dump(outText, f, indent=4)
         f.close()
     return

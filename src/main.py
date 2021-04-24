@@ -4,7 +4,7 @@ from networking import *
 import logging as log
 
 if __name__ == "__main__":
-    log.basicConfig(filename='log.txt', level=log.DEBUG)
+    log.basicConfig(filename='../log.txt', level=log.DEBUG)
     root = log.getLogger()
     root.setLevel(log.DEBUG)
     handler = log.StreamHandler(sys.stdout)
@@ -142,7 +142,11 @@ if __name__ == "__main__":
                                 pubKey = hosts["pubKey"]
                                 break
                         if len(pubKey) > 0:
-                            msg = "".join(header) + str(codecs.encode(encryptFromFile(msg, key = pubKey), "hex").upper(), "utf-8")
+                            encryptedMsg = encryptFromFile(msg, key = pubKey)
+                            if encryptedMsg is not None:
+                                msg = "".join(header) + str(codecs.encode(encryptedMsg, "hex").upper(), "utf-8")
+                            else:
+                                msg = "".join(header)
                         else:
                             print(f"No pubkey key for {currentNode.ipPort} exists")
                             continue
