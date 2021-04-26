@@ -125,7 +125,10 @@ if __name__ == "__main__":
 
                 if msg[1:8] == "encrypt": #/encrypt
                     if currentNode:
-                        currentNode.encrypted = True
+                        if currentNode.encrypted:
+                            currentNode.encrypted = False
+                        else:
+                            currentNode.encrypted = True
 
             else:
                 if currentNode:
