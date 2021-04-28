@@ -62,15 +62,21 @@ class host: # host that receives connections and displays incoming messages
                 encrypted = eval(args[encryptStart + 1])
             if "MSG:" in args:
                 msgStart = args.index("MSG:")
-                msgenc = "".join(args[msgStart+1:])
+                msg = "".join(args[msgStart+1:])
+                timestamp = time.asctime().split()[3]
                 if encrypted:
-                    msg = decryptFromFile(codecs.decode(msgenc, "hex"))
+                    msgEnc = codecs.decode(msg, "hex")
+                    msgEncHex = msg
+                    msg = decryptFromFile(msgEnc)
                     if msg is not None:
-                        print(msg)
+                        print(f"[{timestamp}] {ipPort}: {msg}")
                     else:
-                        print(msgenc)
+                        print(f"[{timestamp}] {ipPort}: {msgEncHex}")
+                        print(f"[{timestamp}] {ipPort}: {msgEnc}")
+                else:
+                    print(f"[{timestamp}] {ipPort}: {msg}")
 
-            log.debug(f"Received: {data}   From: {hostname} {ipPort}")
+                log.debug(f"Received: {data}   From: {hostname} {ipPort}")
 
 
 

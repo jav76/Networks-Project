@@ -13,25 +13,6 @@ if __name__ == "__main__":
     handler.setFormatter(formatter)
     root.addHandler(handler)
 
-    """
-    teststr = "testing asdasdfasdfgdfaaaaaaaaaaaaaaaaaaaaghdfghdfghdfghdfghfasdfasdfasdfasfdf"
-    genKeys(2048)
-    enc = encryptFromFile(teststr, "id_rsa.pub")
-    print(enc)
-    enc = str(codecs.encode(enc, "hex").upper(), "utf-8")
-    print(enc)
-    print(decryptFromFile(codecs.decode(enc, "hex"), "id_rsa"))
-    """
-
-    """
-    data = readJSON()
-    for i in data["hosts"]:
-        print(i)
-        for key, val in i.items():
-            print(f"{key} {val}")
-    """
-
-
     try:
         portMapping()
     except Exception as e:
@@ -118,7 +99,7 @@ if __name__ == "__main__":
 
                 if msg[1:7] == "keygen": #/keygen
                     args = msg[8:].split(" ")
-                    size = 3072
+                    size = 4096
                     if args[0].isnumeric():
                         size = args[0]
                     genKeys(int(size))
