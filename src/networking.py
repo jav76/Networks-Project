@@ -56,8 +56,10 @@ class host: # host that receives connections and displays incoming messages
         while True:
             data = conn[0].recv(2048).decode()
             args = data.split()
-            encryptStart = args.index("ENCRYPTED:")
-            encrypted = eval(args[encryptStart + 1])
+            encrypted = False
+            if "ENCRYPTED:" in args:
+                encryptStart = args.index("ENCRYPTED:")
+                encrypted = eval(args[encryptStart + 1])
             if "MSG:" in args:
                 msgStart = args.index("MSG:")
                 msgenc = "".join(args[msgStart+1:])
