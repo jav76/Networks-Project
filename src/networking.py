@@ -50,7 +50,7 @@ class host: # host that receives connections and displays incoming messages
         ipPort = conn[1]
         hostname = ""
         try:
-            socket.gethostbyaddr(ipPort[0])[0]
+            hostname = socket.gethostbyaddr(ipPort[0])[0]
         except:
             pass
         while True:
@@ -69,12 +69,12 @@ class host: # host that receives connections and displays incoming messages
                     msgEncHex = msg
                     msg = decryptFromFile(msgEnc)
                     if msg is not None:
-                        print(f"[{timestamp}] {ipPort}: {msg}")
+                        print(f"[{timestamp}] {hostname}: {msg}")
                     else:
-                        print(f"[{timestamp}] {ipPort}: {msgEncHex}")
-                        print(f"[{timestamp}] {ipPort}: {msgEnc}")
+                        print(f"[{timestamp}] {hostname}: {msgEncHex}")
+                        print(f"[{timestamp}] {hostname}: {msgEnc}")
                 else:
-                    print(f"[{timestamp}] {ipPort}: {msg}")
+                    print(f"[{timestamp}] {hostname}: {msg}")
 
                 log.debug(f"Received: {data}   From: {hostname} {ipPort}")
 
@@ -86,14 +86,13 @@ class connectionNode: # For outgoing connections
         self.ipPort = (ip, int(port))
         self.connected = False
         self.encrypted = encrypted
-        if self.connected == False:
-            try:
-                self.node.connect(self.ipPort)
-                log.debug(f"Connected to {self.ipPort}")
-                self.connected = True
-            except:
-                log.warning(f"Could not connect to {self.ipPort}")
-                del self
+        try:
+            self.node.connect(self.ipPort)
+            log.debug(f"Connected to {self.ipPort}")
+            self.connected = True
+        except:
+            log.warning(f"Could not connect to {self.ipPort}")
+            del self
 
     def send_msg(self, message):
         self.node.send(message.encode())

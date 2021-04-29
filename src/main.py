@@ -138,7 +138,6 @@ if __name__ == "__main__":
                         currentNode.send_msg(msg)
                     else:
                         msg = "".join(header) + msg
-
                         currentNode.send_msg(msg)
                     log.debug(f"Sent {msg} to {currentNode.ipPort}")
 
