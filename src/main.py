@@ -14,7 +14,7 @@ if __name__ == "__main__":
     root.addHandler(handler)
 
     try:
-        portMapping()
+        #portMapping()
     except Exception as e:
         log.warning(f"Could not start UPnP: {e}")
     log.debug("Hello networked world!")
@@ -122,7 +122,7 @@ if __name__ == "__main__":
                         JSONdata = readJSON()
                         entryExists = False
                         for hosts in JSONdata["hosts"]:
-                            if hosts["ip"] == currentNode.ipPort[0] and hosts["direction"] == "incoming":
+                            if hosts["ip"] == currentNode.ipPort[0] and hosts["direction"] == "outgoing":
                                 pubKey = hosts["pubKey"]
                                 break
                         if len(pubKey) > 0:
