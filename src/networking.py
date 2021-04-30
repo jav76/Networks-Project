@@ -75,7 +75,8 @@ class host: # host that receives connections and displays incoming messages
                         print(f"[{timestamp}] {hostname}: {msgEncHex}")
                         print(f"[{timestamp}] {hostname}: {msgEnc}")
                 else:
-                    msg = data[msgStart + 1:]
+                    msgStart2 = data.find("MSG:")
+                    msg = data[msgStart2 + 4:]
                     print(f"[{timestamp}] {hostname}: {msg}")
 
                 log.debug(f"Received: {data}   From: {hostname} {ipPort}")
