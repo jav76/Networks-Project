@@ -14,7 +14,7 @@ if __name__ == "__main__":
     root.addHandler(handler)
 
     try:
-        #portMapping()
+        portMapping()
     except Exception as e:
         log.warning(f"Could not start UPnP: {e}")
     log.debug("Hello networked world!")
