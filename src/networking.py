@@ -62,9 +62,10 @@ class host: # host that receives connections and displays incoming messages
                 encrypted = eval(args[encryptStart + 1])
             if "MSG:" in args:
                 msgStart = args.index("MSG:")
-                msg = "".join(args[msgStart+1:])
+
                 timestamp = time.asctime().split()[3]
                 if encrypted:
+                    msg = "".join(args[msgStart + 1:])
                     msgEnc = codecs.decode(msg, "hex")
                     msgEncHex = msg
                     msg = decryptFromFile(msgEnc)
@@ -74,6 +75,7 @@ class host: # host that receives connections and displays incoming messages
                         print(f"[{timestamp}] {hostname}: {msgEncHex}")
                         print(f"[{timestamp}] {hostname}: {msgEnc}")
                 else:
+                    msg = data[msgStart + 1:]
                     print(f"[{timestamp}] {hostname}: {msg}")
 
                 log.debug(f"Received: {data}   From: {hostname} {ipPort}")

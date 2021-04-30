@@ -13,10 +13,6 @@ if __name__ == "__main__":
     handler.setFormatter(formatter)
     root.addHandler(handler)
 
-    try:
-        portMapping()
-    except Exception as e:
-        log.warning(f"Could not start UPnP: {e}")
     log.debug("Hello networked world!")
     server = host()
     always_receive = threading.Thread(target=server.acceptConnections)
